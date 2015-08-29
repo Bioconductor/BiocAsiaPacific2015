@@ -34,7 +34,7 @@ stopifnot(
 
 - W0. [Overview](W0-Overview.html)
 - W1. [Introduction: Analysis and Comprehension of High Throughput Genomic Data](W1-Introduction.html)
-- W2. [Sequences, Alignments, and Large Data](W2-Large-Data.html)
+- W2. [Sequences, Alignments, and Large Data](W2-Data-Representations.html)
 - W3. [RNA-Seq Known-gene Differential Expression](W3-RNASeq.html)
 - W4. [Gene, Genome, and Variant Annotation](W4-Annotation.html)
 - W5. (Extra) [Shiny for Interactive Visualization](W5-Shiny.html)
