@@ -1,0 +1,141 @@
+---
+title: "Workshop: W5 - Shiny"
+output:
+  BiocStyle::html_document:
+    toc: false
+vignette: >
+  % \VignetteIndexEntry{Workshop: W5 - Shiny}
+  % \VignetteEngine{knitr::rmarkdown}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+options(width=100, max.print=1000)
+knitr::opts_chunk$set(
+    eval=as.logical(Sys.getenv("KNITR_EVAL", "TRUE")),
+    cache=as.logical(Sys.getenv("KNITR_CACHE", "TRUE")))
+```
+
+```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
+suppressPackageStartupMessages({
+    library(shiny)
+    library(RNAseqData.HNRNPC.bam.chr14)
+    library(Homo.sapiens)
+    library(Gviz)
+})
+```
+
+Author: Martin Morgan (<a
+  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+Date: 7 September, 2015<br />
+Back to [Workshop Outline](Developer-Meeting-Workshop.html)<br />
+
+The material in this document requires _R_ version 3.2 and
+_Bioconductor_ version 3.2
+
+```{r configure-test}
+stopifnot(
+    getRversion() >= '3.2' && getRversion() < '3.3',
+    BiocInstaller::biocVersion() == "3.2"
+)
+```
+
+# Interactive visualization -- `shiny`
+
+Writing a [shiny](http://shiny.rstudio.com) app
+
+- 'User interface' describing what the user sees
+- 'Server' implementing the logic that transforms user selections to
+  outputs
+- Very interesting 'reactive' programming model; sort of like an Excel
+  spread sheet, where changing a cell causes a formula in another cell
+  to update.
+
+A simple directory with user interface (`ui.R`) and server
+(`server.R`) _R_ scripts
+
+- User interface, file `ui.R`
+
+    ```{r shiny-ui, eval=FALSE}
+    library(shiny)
+    library(RNAseqData.HNRNPC.bam.chr14)
+    library(Homo.sapiens)
+    
+    ## Get all SYMBOLs on chr14
+    symbols <- keys(Homo.sapiens, keytype="SYMBOL")
+    map <- select(Homo.sapiens, symbols, "TXCHROM", "SYMBOL")
+    symchoices <- sort(unique(map$SYMBOL[map$TXCHROM %in% "chr14"]))
+    
+    ## Possible BAM files
+    bamchoices <- basename(RNAseqData.HNRNPC.bam.chr14_BAMFILES)
+    
+    ## Define the user interface
+    shinyUI(fluidPage(
+    
+        ## Application title
+        titlePanel("BAMSpector: Reads Supporting Gene Models"),
+    
+        sidebarLayout(
+            sidebarPanel(
+                ## input gene symbol (fancy: select from available)
+                selectInput("symbol", "Gene Symbol", symchoices),
+    
+                ## input path to BAM file
+                selectInput("bam", "BAM File", bamchoices, multiple=TRUE)),
+    
+            ## Show a plot of the generated distribution
+            mainPanel(plotOutput("tracksPlot")))
+        ))
+    ```
+
+- Server, file `server.R`
+
+    ```{r shiny-server, eval=FALSE}
+    ## load required libraries
+    library(shiny)
+    library(RNAseqData.HNRNPC.bam.chr14)
+    library(Homo.sapiens)
+    library(Gviz)
+    
+    ## where are the BAM files?
+    dirname <- unique(dirname(RNAseqData.HNRNPC.bam.chr14_BAMFILES))
+    
+    ## What are the ranges of each gene?
+    ranges <- genes(Homo.sapiens, columns="SYMBOL")
+    ranges$SYMBOL <- unlist(ranges$SYMBOL)
+    
+    ## Create a representation of each gene region
+    genes <- GeneRegionTrack(TxDb.Hsapiens.UCSC.hg19.knownGene,
+                             chromosome="chr14")
+    
+    shinyServer(function(input, output) {
+    
+        output$tracksPlot <- renderPlot({
+            if (length(input$bam) > 0) {
+                ## coverage on each BAM file
+                bam <- file.path(dirname, input$bam)
+                coverage <- Map(DataTrack,
+                    range = bam, name = bam,
+                    MoreArgs=list(type = 'histogram',
+                        window = -1, genome = 'hg19',
+                        chromosome = 'chr14'))
+            } else {
+                coverage <- list()
+            }
+    
+            ## Select the correct range
+            range <- ranges[match(input$symbol, ranges$SYMBOL)]
+    
+            ## plot the GeneRegionTrack and coverage
+            plotTracks(c(list(genes), coverage),
+                       from = start(range), to=end(range),
+                       chr='chr14', windowSize = 30)
+        })
+    })
+    ```
+
+- Application
+
+    ```{r shiny-launch, eval=FALSE}
+    shiny::runApp()
+    ```

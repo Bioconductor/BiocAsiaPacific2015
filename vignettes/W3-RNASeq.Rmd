@@ -1,0 +1,173 @@
+---
+title: "Workshop: W2 - RNASeq"
+output:
+  BiocStyle::html_document:
+    toc: false
+vignette: >
+  % \VignetteIndexEntry{Workshop: W2 - RNASeq}
+  % \VignetteEngine{knitr::rmarkdown}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+options(width=100, max.print=1000)
+knitr::opts_chunk$set(
+    eval=as.logical(Sys.getenv("KNITR_EVAL", "TRUE")),
+    cache=as.logical(Sys.getenv("KNITR_CACHE", "TRUE")))
+```
+
+```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
+suppressPackageStartupMessages({
+    library(airway)
+    library(DESeq2)
+})
+```
+
+Author: Martin Morgan (<a
+  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+Date: 7 September, 2015<br />
+Back to [Workshop Outline](Developer-Meeting-Workshop.html)<br />
+
+The material in this document requires _R_ version 3.2 and
+_Bioconductor_ version 3.2
+
+```{r configure-test}
+stopifnot(
+    getRversion() >= '3.2' && getRversion() < '3.3',
+    BiocInstaller::biocVersion() == "3.2"
+)
+```
+
+# Statistical analysis of differential expression -- `DESeq2`
+
+1. Experimental design
+2. Wet-lab preparation
+3. High-throughput sequencing
+4. Alignment
+    - Whole-genome, or transcriptome
+5. Summary
+    - Count reads overlapping regions of interest:
+      `GenomicAlignments::summarizeOverlaps()`
+6. **Statistical analysis**
+    - [DESeq2][], [edgeR][]
+7. Comprehension
+
+More extensive material
+
+- [edgeR][] and [limma][] vignettes.
+- [DESeq2][] vignette.
+- [airway][] vignette for alignment and summary stages.
+- [RNA-Seq workflow](http://bioconductor.org/help/workflows/rnaseqGene/)
+  providing a more extended analysis of the airway data set.
+
+# Challenges & solutions
+
+Starting point
+
+- Matrix of _counts_ of reads overlapping each region of interest
+- Counts provide statistical information -- larger counts indicate
+  greater confidence that the read was observed. Standardized measures
+  (e.g., RPKM) ignore this information and therefore lose statistical
+  power.
+
+Normalization
+
+- Differences in read counts per sample for purely technical reasons
+- Simple scaling by total read count inadequate -- induces
+  correlations with low-count reads
+- General solution: scale by a more robust measure of size, e.g., log
+  geometric mean, quantile, ...
+
+Error model
+
+- Poisson 'shot' noise of reads sampled from a genome. E.g., longer
+  genes receive more aligned reads compared to shorter genes with
+  identical expression.
+- Additional biological variation due to differences between genes and
+  individuals
+- Common modeling assumptions: _negative binomial_ variance
+    - Dispersion parameter
+
+Limited sample size
+
+- A handful of samples in each treatment
+- Many 1000's of statistical tests
+- Challenge -- limited statistical power
+- Solution -- borrow information
+    - Estimate variance as weighted average of _per gene_ variance,
+      and _average variance_ of all genes
+    - Per-gene variances are estimated precisely, though with some
+      loss of accuracy
+    - Example of _moderated_ test statistic
+
+Multiple testing
+
+- Need to adjust for multiple comparisons
+- Reducing number of tests enhances statistical power
+- Filter genes to exclude from testing using _a priori_ criteria
+
+    - Not biologically interesting
+    - Not statistically interesting _under the null_, e.g.,
+      insufficient counts across samples
+
+# Work flow
+
+## Data representation
+
+Three types of information
+
+- A `matrix` of counts of reads overlapping regions of interest
+- A `data.frame` summarizing samples used in the analysis
+- `GenomicRanges` describing the regions of interest
+
+`SummarizedExperiment` coordinates this information
+
+- Coordinated management of three data resources
+- Easy integration with other _Bioconductor_ software
+
+![](our_figures/SE_Description.png)
+
+```{r airway}
+library("airway")
+data(airway)
+airway
+
+## main components of SummarizedExperiment
+head(assay(airway))
+colData(airway)
+rowRanges(airway)
+
+## e.g., coordinated subset to include dex 'trt'  samples
+airway[, airway$dex == "trt"]
+
+## e.g., keep only rows with non-zero counts
+airway <- airway[rowSums(assay(airway)) != 0, ]
+```
+
+## DESeq2 work flow
+
+1. Add experimental design information to the `SummarizedExperiment`
+
+    ```{r DESeqDataSet}
+    library(DESeq2)
+    dds <- DESeqDataSet(airway, design = ~ cell + dex)
+    ```
+
+2. Peform the essential work flow steps
+
+    ```{r DESeq-workflow}
+    dds <- DESeq(dds)
+    dds
+    ```
+
+3. Extract results
+
+    ```{r DESeq-result}
+    res <- results(dds)
+    res
+    ```
+
+[DESeq2]: http://bioconductor.org/packages/DESeq2
+[limma]: http://bioconductor.org/packages/limma
+[edgeR]: http://bioconductor.org/packages/edgeR
+[airway]: http://bioconductor.org/packages/airway

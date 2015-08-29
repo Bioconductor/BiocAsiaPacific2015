@@ -1,0 +1,14 @@
+Package: BiocAsiaPacific2015
+Type: Package
+Title: R / Bioconductor Material for Bioconductor Asia/Pacific Short
+    Course, Developer Meeting, and Presentation
+Version: 0.0.1
+Authors@R: c(
+    person("Martin", "Morgan", role="cre",
+        email="mtmorgan@fredhutch.org"))
+Description: Vignettes and data to support the first Bioconductor Asia
+    / Pacific meeting, held in 2015 in Tokyo, Japan.
+Imports: BiocInstaller
+Suggests: BiocStyle, knitr
+License: Artistic-2.0
+VignetteBuilder: knitr

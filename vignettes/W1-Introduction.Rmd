@@ -1,0 +1,447 @@
+---
+title: "Workshop: W1 - Introduction: Analysis and Comprehension of High Throughput Genomic Data"
+output:
+  BiocStyle::html_document:
+    toc: false
+vignette: >
+  % \VignetteIndexEntry{Workshop: W1 - Introduction: Analysis and Comprehension of High Throughput Genomic Data}
+  % \VignetteEngine{knitr::rmarkdown}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+options(width=100, max.print=1000)
+knitr::opts_chunk$set(
+    eval=as.logical(Sys.getenv("KNITR_EVAL", "TRUE")),
+    cache=as.logical(Sys.getenv("KNITR_CACHE", "TRUE")))
+```
+
+```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
+## suppressPackageStartupMessages({})
+```
+
+Author: Martin Morgan (<a
+  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+Date: 7 September, 2015<br />
+Back to [Workshop Outline](Developer-Meeting-Workshop.html)<br />
+
+The material in this document requires _R_ version 3.2 and
+_Bioconductor_ version 3.2
+
+```{r configure-test}
+stopifnot(
+    getRversion() >= '3.2' && getRversion() < '3.3',
+    BiocInstaller::biocVersion() == "3.2"
+)
+```
+
+# Overall workflow
+
+1. Experimental design
+    - Keep it simple!
+    - Replication!
+    - Avoid or track batch effects
+2. Wet-lab preparation
+3. High-throughput sequencing
+    - Output: FASTQ files of reads and their quality scores
+4. Alignment
+    - Many different aligners, some specialized for different purposes
+    - Output: BAM files of aligned reads
+5. Summary
+    - e.g., _count_ of reads overlapping regions of interest (e.g., genes)
+6. Statistical analysis
+7. Comprehension
+
+![Alt Sequencing Ecosystem](our_figures/SequencingEcosystem.png)
+
+Notes
+
+- de novo _Assembly_ outside the scope of _Bioconductor_
+
+# Two simple _shiny_ apps
+
+- BAMSpector -- display gene models and underlying support across BAM
+  (aligned read) files
+
+    ```{r shiny-BAMSpector, eval=FALSE}
+    app <- system.file(package="BiocAsiaPacific2015", "BAMSpector")
+    shiny::runApp(app)
+    ```
+
+- MAPlotExplorer -- summarize two-group differential expression,
+  including drill-down of individual genes. Based on [CSAMA
+  2015](http://github.com/CSAMA2015/materials/labs/4_Thursday/Interactive_data_visualization_with_Shiny/)
+  lab by Andrzej Oles.
+
+    ```{r shiny-MAPlotExplorer, eval=FALSE}
+    app <- system.file(package="BiocAsiaPacific2015", "MAPlotExplorer")
+    shiny::runApp(app)
+    ```
+
+# How _Bioconductor_ helps
+
+Annotation
+
+- Gene (e.g., exons-within-transcipts) models 
+- Identifier mapping (e.g., 'HNRPC' to Entrez identifier used in
+  the gene model)
+
+Standard (large) file input & manipulation, e.g., BAM files of aligned reads
+
+Statistical analysis
+
+- Differential expression
+- ChIPSeq
+- Variants
+- Flow cytometery
+- Proteomics
+- ...
+
+Key resources
+
+- web site: [http://biocondcutor.org](http://biocondcutor.org)
+
+  - [biocViews](http://biocondcutor.org/pacakges)
+  - Package 'landing pages', e.g., [edgeR](http://biocondcutor.org/packages/edgeR)
+  - [Help](http://biocondcutor.org/help)
+  - [Developer resources](http://biocondcutor.org/developers): new
+    package submission, developer
+    [mailing list](https://stat.ethz.ch/mailman/listinfo/bioc-devel),
+    etc.
+
+- support: [https://support.bioconductor.org](https://support.bioconductor.org)
+
+# _R_ refresher
+
+## Language and environment for statistical computing and graphics
+
+- Full-featured programming language
+- Interactive and *interpretted* -- convenient and forgiving
+- Coherent, extensive documentation
+- Statistical, e.g. `factor()`, `NA`
+- Extensible -- CRAN, Bioconductor, github, ...
+
+## Vector, class, object
+
+- Efficient _vectorized_ calculations on 'atomic' vectors `logical`,
+  `integer`, `numeric`, `complex`, `character`, `byte`
+- Atomic vectors are building blocks for more complicated _objects_
+  - `matrix` -- atomic vector with 'dim' attribute
+  - `data.frame` -- list of equal length atomic vectors
+- Formal _classes_ represent complicated combinations of vectors,
+  e.g., the return value of `lm()`, below
+
+## Function, generic, method
+
+- Functions transform inputs to outputs, perhaps with side effects,
+  e.g., `rnorm(1000)`
+  - Argument matching first by name, then by position
+  - Functions may define (some) arguments to have default values
+- _Generic_ functions dispatch to specific _methods_ based on class of
+  argument(s), e.g., `print()`.
+- Methods are functions that implement specific generics, e.g.,
+  `print.factor`; methods are invoked _indirectly_, via the generic.
+- Many but not all functions able to manipulate a particular class are
+  methods, e.g., `abline()` used below is a plain-old-funciton.
+
+## Programming
+
+Iteration:
+
+- `lapply()`
+
+    ```{r lapply-args}
+    args(lapply)
+    ```
+
+   - Meaning: for a vector `X` (typically a `list()`), apply a
+     function `FUN` to each vector element, returning the result as
+     a **l**ist. `...` are additional arguments to `FUN`.
+   - `FUN` can be built-in, or a user-defined function
+
+    ```{r lapply-eg}
+    lst <- list(a=1:2, b=2:4)
+    lapply(lst, log)      # 'base' argument default; natural log
+    lapply(lst, log, 10)  # '10' is second argument to 'log()', i.e., log base 10
+    ```
+
+   - `sapply()` -- like `lapply()`, but simplify the result to a
+     vector, matrix, or array, if possible.
+   - `vapply()` -- like `sapply()`, but requires that the return
+     type of `FUN` is specified; this can be safer -- an error when
+     the result is of an unexpected type.
+
+- `mapply()` (also `Map()`)
+
+    ```{r}
+    args(mapply)
+    ```
+
+  - `...` are one or more vectors, recycled to be of the same
+    length. `FUN` is a function that takes as many arguments as
+    there are components of `...`. `mapply` returns the result of
+    applying `FUN` to the elements of the vectors in `...`.
+
+    ```{r mapply-eg}
+    mapply(seq, 1:3, 4:6, SIMPLIFY=FALSE) # seq(1, 4); seq(2, 5); seq(3, 6)
+    ```
+
+  - `apply()`
+
+    ```{r apply}
+    args(apply)
+    ```
+
+  - For a matrix or array `X`, apply `FUN` to each `MARGIN`
+    (dimension, e.g., `MARGIN=1` means apply `FUN` to each row,
+    `MARGIN=2` means apply `FUN` to each column)
+
+- Traditional iteration programming constructs `repeat {}`, `for () {}`
+
+  - Almost always more error-prone, less efficient, and harder to 
+    understand than `lapply()` !
+
+Conditional
+
+```{r, eval=FALSE}
+if (test) {
+    ## code if TEST == TRUE
+} else {
+    ## code if TEST == FALSE
+}
+```
+
+Functions (see table below for a few favorites)
+
+- Easy to define your own functions
+
+```{r myfun}
+fun <- function(x) {
+    length(unique(x))
+}
+## list of length 5, each containsing a sample (with replacement) of letters
+lets <- replicate(5, sample(letters, 50, TRUE), simplify=FALSE)
+sapply(lets, fun)
+```
+
+## Introspection & Help
+
+Introspection
+
+- General properties, e.g., `class()`, `str()`
+- Class-specific properties, e.g., `dim()`
+
+Help
+
+- `?"print"`: help on the generic print
+- `?"print.data.frame"`: help on print method for objects of class
+    data.frame.
+- `help(package="GenomeInfoDb")`
+- `browseVignettes("GenomicRanges")`
+- `methods("plot")`
+- `methods(class="lm")`
+
+## Examples
+
+_R_ vectors, vectorized operations, `data.frame()`, formulas,
+functions, objects, class and method discovery (introspection).
+
+```{r}
+x <- rnorm(1000)                     # atomic vectors
+y <- x + rnorm(1000, sd=.5)
+df <- data.frame(x=x, y=y)           # object of class 'data.frame'
+plot(y ~ x, df)                      # generic plot, method plot.formula
+fit <- lm(y ~x, df)                  # object of class 'lm'
+methods(class=class(fit))            # introspection
+anova(fit)
+plot(y ~ x, df)                      # methods(plot); ?plot.formula
+abline(fit, col="red", lwd=3, lty=2) # a function, not generic.method
+```
+
+Programming example -- group 1000 SYMBOLs into GO identifiers
+
+```{r lapply-setup, echo=FALSE}
+fl <- system.file(package="BiocAsiaPacific2015", "extdata", "symgo.csv")
+```
+```{r lapply-user-setup, eval=FALSE}
+## example data
+fl <- file.choose()      ## symgo.csv
+```
+```{r lapply}
+symgo <- read.csv(fl, row.names=1, stringsAsFactors=FALSE)
+head(symgo)
+dim(symgo)
+length(unique(symgo$SYMBOL))
+## split-sapply
+go2sym <- split(symgo$SYMBOL, symgo$GO)
+len1 <- sapply(go2sym, length)          # compare with lapply, vapply
+## built-in functions for common actions
+len2 <- lengths(go2sym)
+identical(len1, len2)
+## smarter built-in functions, e.g., omiting NAs
+len3 <- aggregate(SYMBOL ~ GO, symgo, length)
+head(len3)
+## more fun with aggregate()
+head(aggregate(GO ~ SYMBOL, symgo, length))
+head(aggregate(SYMBOL ~ GO, symgo, c))
+## your own function -- unique, lower-case identifiers
+uidfun  <- function(x) {
+    unique(tolower(x))
+}
+head(aggregate(SYMBOL ~ GO , symgo, uidfun))
+## as an 'anonymous' function
+head(aggregate(SYMBOL ~ GO, symgo, function(x) {
+    unique(tolower(x))
+}))
+```
+
+# Case studies
+
+## ALL phenotypic data
+
+These case studies serve as refreshers on _R_ input and manipulation
+of data.
+
+Input a file that contains ALL (acute lymphoblastic leukemia) patient
+information
+
+```{r echo=FALSE}
+fname <- system.file(package="BiocAsiaPacific2015", "extdata",
+    "ALLphenoData.tsv")
+stopifnot(file.exists(fname))
+pdata <- read.delim(fname)
+```
+```{r echo=TRUE, eval=FALSE}
+fname <- file.choose()   ## "ALLphenoData.tsv"
+stopifnot(file.exists(fname))
+pdata <- read.delim(fname)
+```
+
+Check out the help page `?read.delim` for input options, and explore
+basic properties of the object you've created, for instance...
+
+```{r ALL-properties}
+class(pdata)
+colnames(pdata)
+dim(pdata)
+head(pdata)
+summary(pdata$sex)
+summary(pdata$cyto.normal)
+```
+
+Remind yourselves about various ways to subset and access columns of a
+data.frame
+
+```{r ALL-subset}
+pdata[1:5, 3:4]
+pdata[1:5, ]
+head(pdata[, 3:5])
+tail(pdata[, 3:5], 3)
+head(pdata$age)
+head(pdata$sex)
+head(pdata[pdata$age > 21,])
+```
+
+It seems from below that there are 17 females over 40 in the data set,
+but when sub-setting `pdata` to contain just those individuals 19 rows
+are selected. Why? What can we do to correct this?
+
+```{r ALL-subset-NA}
+idx <- pdata$sex == "F" & pdata$age > 40
+table(idx)
+dim(pdata[idx,])
+```
+
+Use the `mol.biol` column to subset the data to contain just
+individuals with 'BCR/ABL' or 'NEG', e.g.,
+
+```{r ALL-BCR/ABL-subset}
+bcrabl <- pdata[pdata$mol.biol %in% c("BCR/ABL", "NEG"),]
+```
+
+The `mol.biol` column is a factor, and retains all levels even after
+subsetting. How might you drop the unused factor levels?
+
+```{r ALL-BCR/ABL-drop-unused}
+bcrabl$mol.biol <- factor(bcrabl$mol.biol)
+```
+
+The `BT` column is a factor describing B- and T-cell subtypes
+
+```{r ALL-BT}
+levels(bcrabl$BT)
+```
+
+How might one collapse B1, B2, ... to a single type B, and likewise for T1, T2, ..., so there are only two subtypes, B and T
+
+```{r ALL-BT-recode}
+table(bcrabl$BT)
+levels(bcrabl$BT) <- substring(levels(bcrabl$BT), 1, 1)
+table(bcrabl$BT)
+```
+
+Use `xtabs()` (cross-tabulation) to count the number of samples with
+B- and T-cell types in each of the BCR/ABL and NEG groups
+
+```{r ALL-BCR/ABL-BT}
+xtabs(~ BT + mol.biol, bcrabl)
+```
+
+Use `aggregate()` to calculate the average age of males and females in
+the BCR/ABL and NEG treatment groups.
+
+```{r ALL-aggregate}
+aggregate(age ~ mol.biol + sex, bcrabl, mean)
+```
+
+Use `t.test()` to compare the age of individuals in the BCR/ABL versus
+NEG groups; visualize the results using `boxplot()`. In both cases,
+use the `formula` interface. Consult the help page `?t.test` and re-do
+the test assuming that variance of ages in the two groups is
+identical. What parts of the test output change?
+
+```{r ALL-age}
+t.test(age ~ mol.biol, bcrabl)
+boxplot(age ~ mol.biol, bcrabl)
+```
+
+[biocViews]: http://bioconductor.org/packages/BiocViews.html#___Software
+[AnnotationData]: http://bioconductor.org/packages/BiocViews.html#___AnnotationData
+
+[aprof]: http://cran.r-project.org/web/packages/aprof/index.html
+[hexbin]: http://cran.r-project.org/web/packages/hexbin/index.html
+[lineprof]: https://github.com/hadley/lineprof
+[microbenchmark]: http://cran.r-project.org/web/packages/microbenchmark/index.html
+
+
+[AnnotationDbi]: http://bioconductor.org/packages/AnnotationDbi
+[BSgenome]: http://bioconductor.org/packages/BSgenome
+[Biostrings]: http://bioconductor.org/packages/Biostrings
+[CNTools]: http://bioconductor.org/packages/CNTools
+[ChIPQC]: http://bioconductor.org/packages/ChIPQC
+[ChIPpeakAnno]: http://bioconductor.org/packages/ChIPpeakAnno
+[DESeq2]: http://bioconductor.org/packages/DESeq2
+[DiffBind]: http://bioconductor.org/packages/DiffBind
+[GenomicAlignments]: http://bioconductor.org/packages/GenomicAlignments
+[GenomicRanges]: http://bioconductor.org/packages/GenomicRanges
+[IRanges]: http://bioconductor.org/packages/IRanges
+[KEGGREST]: http://bioconductor.org/packages/KEGGREST
+[PSICQUIC]: http://bioconductor.org/packages/PSICQUIC
+[Rsamtools]: http://bioconductor.org/packages/Rsamtools
+[ShortRead]: http://bioconductor.org/packages/ShortRead
+[VariantAnnotation]: http://bioconductor.org/packages/VariantAnnotation
+[VariantFiltering]: http://bioconductor.org/packages/VariantFiltering
+[VariantTools]: http://bioconductor.org/packages/VariantTools
+[biomaRt]: http://bioconductor.org/packages/biomaRt
+[cn.mops]: http://bioconductor.org/packages/cn.mops
+[h5vc]: http://bioconductor.org/packages/h5vc
+[edgeR]: http://bioconductor.org/packages/edgeR
+[ensemblVEP]: http://bioconductor.org/packages/ensemblVEP
+[limma]: http://bioconductor.org/packages/limma
+[metagenomeSeq]: http://bioconductor.org/packages/metagenomeSeq
+[phyloseq]: http://bioconductor.org/packages/phyloseq
+[snpStats]: http://bioconductor.org/packages/snpStats
+
+[org.Hs.eg.db]: http://bioconductor.org/packages/org.Hs.eg.db
+[TxDb.Hsapiens.UCSC.hg19.knownGene]: http://bioconductor.org/packages/TxDb.Hsapiens.UCSC.hg19.knownGene
+[BSgenome.Hsapiens.UCSC.hg19]: http://bioconductor.org/packages/BSgenome.Hsapiens.UCSC.hg19
