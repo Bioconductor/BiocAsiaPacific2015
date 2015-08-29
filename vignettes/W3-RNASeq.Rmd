@@ -1,8 +1,8 @@
 ---
-title: "Workshop: W2 - RNASeq"
+title: "Workshop: W3 - RNASeq"
 output:
   BiocStyle::html_document:
-    toc: false
+    toc: true
 vignette: >
   % \VignetteIndexEntry{Workshop: W2 - RNASeq}
   % \VignetteEngine{knitr::rmarkdown}

@@ -2,7 +2,7 @@
 title: "Workshop: W1 - Introduction: Analysis and Comprehension of High Throughput Genomic Data"
 output:
   BiocStyle::html_document:
-    toc: false
+    toc: true
 vignette: >
   % \VignetteIndexEntry{Workshop: W1 - Introduction: Analysis and Comprehension of High Throughput Genomic Data}
   % \VignetteEngine{knitr::rmarkdown}
@@ -295,9 +295,7 @@ head(aggregate(SYMBOL ~ GO, symgo, function(x) {
 }))
 ```
 
-# Case studies
-
-## ALL phenotypic data
+## Case study: ALL phenotypic data
 
 These case studies serve as refreshers on _R_ input and manipulation
 of data.
