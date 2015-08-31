@@ -9,7 +9,7 @@ Authors@R: c(
 Description: Vignettes and data to support the first Bioconductor Asia
     / Pacific meeting, held in 2015 in Tokyo, Japan.
 Imports: BiocInstaller
-Suggests: BiocStyle, knitr AnnotationHub, BSgenome.Hsapiens.UCSC.hg19,
+Suggests: BiocStyle, knitr, AnnotationHub, BSgenome.Hsapiens.UCSC.hg19,
     BiocParallel, Biostrings, DESeq2, GenomicAlignments, GenomicFiles,
     GenomicRanges, Gviz, Homo.sapiens, IRanges,
     RNAseqData.HNRNPC.bam.chr14, Rsamtools,
