@@ -51,6 +51,20 @@ basic understanding of biological and technological aspects of
 high-throughput sequence analysis. Participants should come prepared
 with a modern wireless-enabled laptop and web browser installed.
 
+# Installation
+
+Follow these steps:
+
+- Install R version 3.2.2 from https://cran.r-studio.com
+- Install the Bioconductor installer
+
+    source("https://bioconductor.org/biocLite.R")
+    
+- Install the course package and depedencies
+
+    biocLite("devtools")
+    biocLite("Bioconductor/BiocAsiaPacific2015", dependencies=TRUE)
+
 # Intended Audience: 
 
 This workshop is for professional bioinformaticians and statisticians
