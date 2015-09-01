@@ -21,12 +21,12 @@ Author: Martin Morgan (<a
 Date: 7 September, 2015<br />
 
 The material in this document requires _R_ version 3.2 and
-_Bioconductor_ version 3.2
+_Bioconductor_ version 3.1
 
 ```{r configure-test}
 stopifnot(
     getRversion() >= '3.2' && getRversion() < '3.3',
-    BiocInstaller::biocVersion() == "3.2"
+    BiocInstaller::biocVersion() >= "3.1"
 )
 ```
 
