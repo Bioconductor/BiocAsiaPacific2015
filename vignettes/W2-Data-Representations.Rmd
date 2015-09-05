@@ -216,7 +216,7 @@ exons(txdb)
 exonsBy(txdb, "tx")
 ```
 
-![Alt Genomic Ranges](our_figures/GRangesList.png)
+![Alt Genomic Ranges List](our_figures/GRangesList.png)
 
 _GRanges_ / _GRangesList_ are incredibly useful
 
