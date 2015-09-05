@@ -1,0 +1,254 @@
+---
+title: "Developer Meeting: Project Updates"
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+vignette: >
+  % \VignetteIndexEntry{Developer Meeting: Project Updates}
+  % \VignetteEngine{knitr::rmarkdown}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+options(width=100, max.print=1000)
+knitr::opts_chunk$set(
+    eval=as.logical(Sys.getenv("KNITR_EVAL", "TRUE")),
+    cache=as.logical(Sys.getenv("KNITR_CACHE", "TRUE")))
+```
+
+Author: Martin Morgan (<a
+  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+Date: 8 September, 2015<br />
+
+# _R_ and _Bioconductor_
+
+_R_
+
+- Open source statistical programming langauge
+- Core langague, 'base' packages, >5000 contributed packages
+- Interactive sessions --> scripts --> packages
+
+_Bioconductor_
+
+- Analysis and comprehension of high-throughput genomic data
+
+    - Rigorous statistical analysis
+    - Reproducible work flows
+    - Integrative analysis
+
+- More than 12 years old, 1024 software packages
+- https://bioconductor.org
+- https://support.bioconductor.org
+
+Why use _R_ / _Bioconductor_?
+
+- Extensive: data, annotation, integration
+- Statistical: volume, technology, experimental design
+- Reproducible: long-term, multi-participant science
+- Leading edge: novel, technology-driven
+- Accessible: affordable, transparent, usable
+- Example: DESeq2 [landing page](http://bioconductor.org/packages/DESeq2)
+
+# Core packages and classes
+
+## Packages
+
+Software
+
+- 1024 packages
+- Sequence, microarray, flow, proteomics, image,
+  ... [biocViews](http://bioconductor.org/packages)
+
+Annotation
+
+- Gene models -- _TxDb_, e.g.,
+  [TxDb.Hsapiens.UCSC.hg38.knownGene](http://bioconductor.org/packages/TxDb.Hsapiens.UCSC.hg38.knownGene)
+- Gene / symbol mapping -- _org_, e.g.,
+  [org.Hs.eg.db](http://bioconductor.org/packages/org.Hs.eg.db)
+- Genome sequence -- _BSgenome_, e.g.,
+  [BSgenome.Hsapiens.UCSC.hg38](http://bioconductor.org/packages/BSgenome.Hsapiens.UCSC.hg38) 
+- ...
+
+ExperimentData
+
+- Curated data summarizing a scientiic experiment, for use as
+  realistic examples or to illustrate reproducibility
+- e.g., [airway](http://bioconductor.org/packages/airway) RNA-seq
+  involving human airway smooth-muscle cell lines
+
+## Core 'Infrastructure' Packages
+
+- Re-used by many analysis-specific packages
+- Enables interoperability (for end users) and robust software (for
+  developers and end users)
+
+<pre>
+                   VariantAnnotation
+                           |
+                           v
+                    GenomicFeatures
+                           |
+                           v
+                       BSgenome
+                           |
+                           v
+                      rtracklayer
+                           |
+                           v
+                    GenomicAlignments
+                      |           |
+                      v           v
+     SummarizedExperiment   Rsamtools  ShortRead
+                  |         |      |      |
+                  v         v      v      v
+                GenomicRanges     Biostrings
+                        |          |
+                        v          v
+               GenomeInfoDb   (XVector)
+                        |     |
+                        v     v
+                        IRanges
+                           |
+                           v 
+                      (S4Vectors)
+</pre>
+
+## Core Classes
+
+_GRanges_, _GRangesList_
+
+- Data -- aligned reads, called peaks, SNPs and other variants,
+  ranges of copy number variants, ...
+- Annotation -- gene models, 'consortium' data (e.g., Roadmap
+  Epigenomics, dbSNP, ...)
+  
+![Alt GRanges](our_figures/GRanges.png)
+
+![Alt GRangesList](our_figures/GRangesList.png)
+
+_DNAString_, _DNAStringSet_
+
+- Whole-genome: `r Biocpkg("BSgenome")`
+- FASTQ (sequence + quality score): `r Biocpkg("ShortRead")`
+
+_SummarizedExperiment_
+
+- Coordinate 'assay' measurements with row and column annotations
+- E.g., RNA-seq
+
+    - assay: gene x sample matrix of count of reads overlapping
+      each gene
+    - rowRanges: genomic coordinates of each gene; additional
+      description of ranges, e.g., log-fold change between
+      treatment groups
+    - colData: description of samples, e.g., identifier, level of
+      experimental factor the sample belongs to, measured
+      covariates
+
+![Alt SummarizedExperiment](our_figures/SE_Description.png)
+
+## File input
+
+| Type   | Example use           | Name                        | Package                                                                   |
+|--------|-----------------------|-----------------------------|---------------------------------------------------------------------------|
+| .bed   | Range annotations     | `BedFile()`                 | `r Biocpkg("rtracklayer")`::`import()`                                    |
+| .wig   | Coverage              | `WigFile()`, `BigWigFile()` | `r Biocpkg("rtracklayer")`::`import()`                                    |
+| .gtf   | Transcript models     | `GTFFile()`                 | `r Biocpkg("rtracklayer")`::`import()`                                    |
+|        |                       |                             | `r Biocpkg("GenomicFeatures")`::`makeTxDbFromGFF()`                       |
+| .2bit  | Genomic Sequence      | `TwoBitFile()`              | `r Biocpkg("rtracklayer")`::`import()`                                    |
+| .fastq | Reads & qualities     | `FastqFile()`               | `r Biocpkg("ShortRead")`::`readFastq()`                                   |
+| .bam   | Aligned reads         | `BamFile()`                 | `r Biocpkg("GenomicRanges")`::`readGAlignments()`, `readGAlignmentsList()` |
+| .tbx   | Indexed tab-delimited | `TabixFile()`               | `r Biocpkg("Rsamtools")`::`scanTabix()`                                   |
+| .vcf   | Variant calls         | `VcfFile()`                 | `r Biocpkg("VariantAnnotation")`::`readVcf()`                             |
+
+# Project updates
+
+## `r Biocpkg("AnnotationHub")`
+
+'Lift over' Epigneome Roadmap BED file of regulatory regions from hg19
+to hg38
+
+```{r annotationhub-roadmap, eval=FALSE}
+library(AnnotationHub)
+library(rtracklayer)
+(hub <- AnnotationHub())
+query(hub , c("EpigenomeRoadMap", "E126", "H3K4ME2"))
+E126 <- hub[["AH29817"]]
+query(hub , c("hg19", "hg38", "chainfile"))
+chain <- hub[["AH14150"]]
+E126hg38 <- liftOver(E126, chain)
+```
+
+## `r Biocpkg("BiocParallel")` / `r Biocpkg("GenomicFiles")`
+
+Large data strategies
+
+- Efficient (vectorized) _R_ code
+- Restriction -- selective input
+- Iteration -- chunk-wise processing
+- Map / reduce paradigm
+
+Parallel evaluation
+
+- `bplapply()` instead of `lapply()`
+- `register()` a back-end
+
+    - Serial: `SerialParam()`
+    - Cores: `MulticoreParam()`
+    - Computers: `SnowParam()`
+    - Clusters: `BatchJobsParam()`
+    - Cloud: ???
+
+    ```{r parallel-sleep}
+    library(BiocParallel)
+    
+    fun <- function(i) {
+        Sys.sleep(1)
+        i
+    }
+    
+    f0 <- function(n)              # serial
+        lapply(seq_len(n), fun)
+    f1 <- function(n)              # parallel; default MulticoreParam (Linux)
+        bplapply(seq_len(n), fun)
+    ```
+
+- Errors and error recovery
+
+    ```{r parallel-err}
+    X <- list(1, "2", 3)
+    res <- bplapply(X, sqrt)
+    res
+    X.redo <- list(1, 2, 3)
+    bplapply(X.redo, sqrt, BPREDO = res)
+    ```
+
+- Debugging -- switch to `SerialParam()`
+
+    ```{r parallel-browser, eval=FALSE}
+    bplapply(X, function(...) {
+        browser()
+        sqrt(...)
+    }, BPREDO = res, BPPARAM=SerialParam())
+    ```
+
+## Other highlights
+
+- docker and Amazon Machine Instance containers
+- `Rsamtools::pileup()`
+- [Homo.sapiens](http://bioconductor.org/packages/Homo.sapiens) and
+  friends
+- Landing page 'shields' for users and developers
+
+# Project directions ??
+
+Single-cell assays
+
+Multi-omics assays
+
+Cloud computing
+
+'Hosted' _Bioconductor_
+
+Big data management
