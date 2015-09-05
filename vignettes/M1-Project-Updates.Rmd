@@ -245,10 +245,15 @@ Parallel evaluation
 
 Single-cell assays
 
+- Manipulation of large, on-disk (?) arrays
+
 Multi-omics assays
+
+- Integrative queries across assays
 
 Cloud computing
 
-'Hosted' _Bioconductor_
+- Pre-configured deployments
+- 'Hosted' _Bioconductor_
 
 Big data management
