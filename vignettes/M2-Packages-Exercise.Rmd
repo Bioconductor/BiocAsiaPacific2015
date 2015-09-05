@@ -1,0 +1,174 @@
+---
+title: "Developer Meeting: Packages"
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+vignette: >
+  % \VignetteIndexEntry{Developer Meeting: Packages}
+  % \VignetteEngine{knitr::rmarkdown}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+options(width=100, max.print=1000)
+knitr::opts_chunk$set(
+    eval=as.logical(Sys.getenv("KNITR_EVAL", "TRUE")),
+    cache=as.logical(Sys.getenv("KNITR_CACHE", "TRUE")))
+```
+
+Author: Martin Morgan (<a
+  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+Date: 8 September, 2015<br />
+
+# Example
+
+`r Biocpkg("goseq")` calculates gene set enrichment statistics for
+RNA-seq style data, but using gene length to weight the contribution
+of individual genes. The motivation is that gene length and read count
+are expected to be positively correlated. Longer genes therefore have
+more power to detect differential expression. This introduces bias
+into gene set enrichment analysis.
+
+I'd like to generalize this, allowing a vector of arbitrary weights to
+be incorporated in the analysis. I've written a function `gseseq()`
+that does this. It is in a file "gseseq.R", the content of which is
+
+```{r gseseq}
+gseseq <- function (genes, isDE, weights, sets) {
+    inp <- data.frame(row.names=genes, isDE=isDE, weight=weights)
+
+    ## overall summaries
+    nTot <- nrow(inp)
+    nTotDE <- sum(inp$isDE)
+    alpha <- sum(inp$weight)
+
+    p <- sapply(sets, function(set, nTot, nTotDE) {
+        ## gene set calculations
+        nInSet <- length(set)
+        nInSetDE <- sum(inp[set, "isDE"])
+        avewt <- mean(inp[set, "weight"])
+        wt <- (nTot - nInSet) * avewt / (alpha - nInSet * avewt)
+
+        ## Wallenius tests
+        d <- dWNCHypergeo(nInSetDE, nInSet, nTot - nInSet, nTotDE, wt)
+        p0 <- pWNCHypergeo(nInSetDE, nInSet, nTot - nInSet, nTotDE, wt,
+                           lower.tail = FALSE)
+        p1 <- pWNCHypergeo(nInSetDE, nInSet, nTot - nInSet, nTotDE, wt)
+
+        ## return
+        c(over=d + p0, under=p1)
+    }, nTot, nTotDE)
+
+    as.data.frame(t(p))
+}
+```
+
+# Old-school (my preferred way)
+
+Create packages 'by hand'
+
+- Definitive source for documentation: _Writing R Extensions_
+  (`RShowDoc("R-exts")`)
+- Example in
+
+    ```{r, eval=FALSE}
+    system.file(package="BiocAsiaPacific2015", "GSESeq")
+    ```
+
+Files and directories with structure
+
+- DESCRIPTION
+
+    ```
+    Package: GSESeq
+    Type: Package
+    Title: Gene set enrichment for RNA-seq data
+    Version: 0.0.3
+    Date: 2015-09-08
+    Authors@R: c(
+        person("Martin", "Morgan", role="cre",
+            email="mtmorgan@roswellpark.org"))
+    Description: Calculates gene set enrichment statistic for
+        weighted gene sets
+    License: Artistic-2.0
+    Imports: BiasedUrn
+    ```
+
+- NAMESPACE
+
+    ```
+    importFrom(BiasedUrn, dWNCHypergeo, pWNCHypergeo)
+    export(gseseq, gsedata)
+    ```
+
+- R/gseseq.R
+- vignettes/GSESeq.Rmd
+
+    - LaTeX (processed to PDF) or markdown (processed to HTML)
+      documents with embedded, evaluated code chunks
+    - `r Biocpkg("BiocStyle")` provides some useful functionality and
+      a consistent style
+    - Markdown and HTML vignettes are much easier to write and use;
+      LaTeX provides rich math, cross-referencing, bibliography and
+      other features
+
+- man/GSESeq-package.Rd, gseseq.Rd, gsedata.Rd
+
+    - LaTeX-style markup; `prompt()` can help with creation.
+
+Optional
+
+- tests/
+  
+    - Highly recommended
+    - The _Bioconductor_ core group mostly uses `r CRANpkg("RUnit")`,
+      but other options are available, especially `r CRANpkg("testthat")`
+    - see http://bioconductor.org/developers/how-to/unitTesting-guidelines
+
+- data/
+
+    - _R_ data objects
+
+- inst/extdata
+
+    - text or other non-R formats; using name 'extdata' is convention
+
+- src/
+
+    - C, C++, or Fortran source code
+
+_Bioconductor_ resources and standards
+
+- http://bioconductor.org/developers/how-to
+- http://bioconductor.org/developers/package-guidelines
+- http://bioconductor.org/developers/package-submission
+
+    - Version numbering
+    - Coding style
+    - Unit tests
+    - Source control (subversion)
+
+# (My) work flow
+
+Thorough -- Build, check and install the package
+
+    R CMD build GSESeq
+    R CMD check GSESeq_0.0.3.tar.gz
+    R CMD INSTALL GSESeq_0.0.3.tar.gz
+    
+Faster, during development -- from within the package directory
+
+    R CMD INSTALL --no-test-load .
+
+# Source control
+
+- Easily track, revert, compare, etc., changes
+- _Bioconductor_ uses subversion, but supports github
+- A really essential skill, and really useful!
+
+# Other approaches
+
+- R Studio 'wizard' -- a great way to start
+- `r CRANpkg("roxygen2")` is a popular facility for inserting
+  documentation and dependencies within code

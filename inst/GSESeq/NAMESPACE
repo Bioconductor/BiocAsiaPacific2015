@@ -1,0 +1,2 @@
+importFrom(BiasedUrn, dWNCHypergeo, pWNCHypergeo)
+exportPattern("^[[:alpha:]]+")
