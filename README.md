@@ -1,3 +1,9 @@
+# Course Google-doc
+
+Last-minute instructions are available on the
+[course google doc](https://docs.google.com/document/d/1U9P9uUWGFhAfTF22YkbxG4GIcZ3koK5BhLRB6MK_F4k/edit?usp=sharing),
+active before and during the course.
+
 # Abstract
 
 DNA sequence analysis generates large volumes of data that present
