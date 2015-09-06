@@ -58,23 +58,13 @@ Notes
 
 - de novo _Assembly_ outside the scope of _Bioconductor_
 
-# Two simple _shiny_ apps
+# A simple _shiny_ apps
 
 - BAMSpector -- display gene models and underlying support across BAM
   (aligned read) files
 
     ```{r shiny-BAMSpector, eval=FALSE}
     app <- system.file(package="BiocAsiaPacific2015", "BAMSpector")
-    shiny::runApp(app)
-    ```
-
-- MAPlotExplorer -- summarize two-group differential expression,
-  including drill-down of individual genes. Based on [CSAMA
-  2015](http://github.com/CSAMA2015/materials/labs/4_Thursday/Interactive_data_visualization_with_Shiny/)
-  lab by Andrzej Oles.
-
-    ```{r shiny-MAPlotExplorer, eval=FALSE}
-    app <- system.file(package="BiocAsiaPacific2015", "MAPlotExplorer")
     shiny::runApp(app)
     ```
 
@@ -97,7 +87,7 @@ Statistical analysis
 - Proteomics
 - ...
 
-Key resources
+## Key resources
 
 - web site: [http://biocondcutor.org](http://biocondcutor.org)
 
