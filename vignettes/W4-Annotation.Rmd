@@ -2,7 +2,7 @@
 title: "Workshop: W4 - Gene, Genome, and Variant Annotation"
 output:
   BiocStyle::html_document:
-    toc: false
+    toc: true
 vignette: >
   % \VignetteIndexEntry{Workshop: W4 - Gene, Genome, and Variant Annotation}
   % \VignetteEngine{knitr::rmarkdown}
@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 ```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
 suppressPackageStartupMessages({
     library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+    library(BSgenome.Hsapiens.UCSC.hg19)
     library(org.Hs.eg.db)
     library(Homo.sapiens)
     library(biomaRt)
@@ -45,9 +46,11 @@ stopifnot(
 
 # Annotation
 
-## Gene model annotation resources -- `TxDb` packages
+## Model organisms
 
-[TxDb.Hsapiens.UCSC.hg19.knownGene][]
+### Gene model annotation resources -- `TxDb` packages
+
+e.g., `{r Biocpkg("TxDb.Hsapiens.UCSC.hg19.knownGene")}
 
 ```{r gene-model-discovery}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -75,7 +78,18 @@ exons(txdb)
 exonsBy(txdb, "tx")
 ```
 
-## Identifier mapping -- `OrgDb`
+
+### Whole-genome sequence -- `BSgenome` packages
+
+e.g., `{r Biocpkg("BSgenome.Hsapiens.UCSC.hg19")}
+
+```{r bsgenome}
+library(BSgenome.Hsapiens.UCSC.hg19)
+genome <- BSgenome.Hsapiens.UCSC.hg19
+getSeq(genome, exons(txdb)[1:100])
+```
+
+### Identifier mapping -- `OrgDb`
 
 ```{r org}
 library(org.Hs.eg.db)
