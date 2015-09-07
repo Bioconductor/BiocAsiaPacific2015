@@ -127,11 +127,12 @@ class(ir)
 getClass(class(ir))
 ```
 
-Notice that `IRanges` extends the `Ranges` class. Now try entering
-`?flank` (`?"flank,<tab>"` if not using _RStudio, where `<tab>` means
-to press the tab key to ask for tab completion). You can see that
-there are help pages for `flank` operating on several different
-classes. Select the completion
+Notice that `IRanges` extends the `Ranges` class. Show
+
+Now try entering `?flank` (if not using _RStudio_, enter
+`?"flank,<tab>"` where `<tab>` means to press the tab key to ask for
+tab completion). You can see that there are help pages for `flank`
+operating on several different classes. Select the completion
 
 ```{r iranges-flank-method, eval=FALSE}
 ?"flank,Ranges-method" 
@@ -162,16 +163,6 @@ flank(gr, 3)
 
 Discover what classes `GRanges` extends, find the help page
 documenting the behavior of `flank` when applied to a `GRanges` object,
-and verify that the help page documents the behavior we just observed.
-```{r granges-class}
-class(gr)
-getClass(class(gr))
-```
-```{r granges-flank-method, eval=FALSE}
-?"flank,GenomicRanges-method"
-```
-Notice that the available `flank()` methods have been augmented by the
-methods defined in the _GenomicRanges_ package.
 
 It seems like there might be a number of helpful methods available for
 working with genomic ranges; we can discover some of these from the
@@ -180,6 +171,19 @@ command line, indicating that the methods should be on the current
 
 ```{r granges-methods}
 methods(class="GRanges")
+```
+
+Notice that the available `flank()` methods have been augmented by the
+methods defined in the _GenomicRanges_ package, including those that are relevant (via inheritance) to the _GRanges_ class.
+
+```{r granges-flank-method}
+grep("flank", methods(class="GRanges"), value=TRUE)
+```
+
+Verify that the help page documents the behavior we just observed.
+
+```{r granges-flank-method-help, eval=FALSE}
+?"flank,GenomicRanges-method"
 ```
 
 Use `help()` to list the help pages in the `GenomicRanges` package,
@@ -483,15 +487,15 @@ BAM files of aligned reads
 
 ![Alt Files and the Bioconductor packages that input them](our_figures/FilesToPackages.png)
 
-## Large data -- `BiocParallel`, `GenomicFiles`
+# Large data -- `BiocParallel`, `GenomicFiles`
 
-### Restriction
+## Restriction
 
 - Input only the data necessary, e.g., `ScanBamParam()`
 - `which`: genomic ranges of interest
 - `what`: 'columns' of BAM file, e.g., 'seq', 'flag'
 
-### Iteration
+## Iteration
 
 - Read entire file, but in chunks
 - Chunk size small enough to fit easily in memory, 
@@ -541,7 +545,7 @@ Iterative programming model
          xlab="GC Content per Aligned Read", ylab="Number of Reads")
     ```
 
-### Parallel evaluation
+## Parallel evaluation
 
 - Cores, computers, clusters, clouds
 - Generally, requires memory management techniques like restriction or

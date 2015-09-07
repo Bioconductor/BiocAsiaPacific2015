@@ -17,7 +17,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
-## suppressPackageStartupMessages({})
+suppressPackageStartupMessages({
+    library(Biostrings)
+})
 ```
 
 Author: Martin Morgan (<a
@@ -58,7 +60,7 @@ Notes
 
 - de novo _Assembly_ outside the scope of _Bioconductor_
 
-# A simple _shiny_ apps
+## A simple _shiny_ apps
 
 - BAMSpector -- display gene models and underlying support across BAM
   (aligned read) files
@@ -68,7 +70,7 @@ Notes
     shiny::runApp(app)
     ```
 
-# How _Bioconductor_ helps
+## How _Bioconductor_ helps
 
 Annotation
 
@@ -136,7 +138,7 @@ Statistical analysis
 
 ## Programming
 
-Iteration:
+Iteration
 
 - `lapply()`
 
@@ -206,9 +208,9 @@ Functions (see table below for a few favorites)
 - Easy to define your own functions
 
 ```{r myfun}
-fun <- function(x) {
+fun <- function(x)
     length(unique(x))
-}
+
 ## list of length 5, each containsing a sample (with replacement) of letters
 lets <- replicate(5, sample(letters, 50, TRUE), simplify=FALSE)
 sapply(lets, fun)
@@ -231,7 +233,9 @@ Help
 - `methods("plot")`
 - `methods(class="lm")`
 
-## Examples
+# Examples
+
+## Base _R_ functionality
 
 _R_ vectors, vectorized operations, `data.frame()`, formulas,
 functions, objects, class and method discovery (introspection).
@@ -248,7 +252,20 @@ plot(y ~ x, df)                      # methods(plot); ?plot.formula
 abline(fit, col="red", lwd=3, lty=2) # a function, not generic.method
 ```
 
-Programming example -- group 1000 SYMBOLs into GO identifiers
+## 'S4' classes
+
+```{r}
+library(Biostrings)
+data(phiX174Phage)
+phiX174Phage
+letterFrequency(phiX174Phage, "GC", as.prob=TRUE)
+```
+
+# Case studies: data manipulation
+
+## Symbols grouped by gene
+
+Group 1000 SYMBOLs into GO identifiers
 
 ```{r lapply-setup, echo=FALSE}
 fl <- system.file(package="BiocAsiaPacific2015", "extdata", "symgo.csv")
@@ -285,7 +302,7 @@ head(aggregate(SYMBOL ~ GO, symgo, function(x) {
 }))
 ```
 
-## Case study: ALL phenotypic data
+## ALL phenotypic data
 
 These case studies serve as refreshers on _R_ input and manipulation
 of data.
