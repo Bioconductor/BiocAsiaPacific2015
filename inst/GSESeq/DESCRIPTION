@@ -3,10 +3,11 @@ Type: Package
 Title: Gene set enrichment for RNA-seq data
 Version: 0.0.3
 Date: 2015-09-08
-    Authors@R: c(
-        person("Martin", "Morgan", role="cre",
-            email="mtmorgan@roswellpark.org"))
-Description: Calculates gene set enrichment statistic for
-    weighted gene sets
+Authors@R: c(
+    person("Martin", "Morgan", role="cre",
+        email="mtmorgan@roswellpark.org"))
+Description: Calculate gene set enrichment statistics for arbitrarily
+    weighted gene sets using Wallenius' noncentral hypergeometric
+    distribution.
 License: Artistic-2.0
 Imports: BiasedUrn

@@ -32,13 +32,19 @@ _R_
 _Bioconductor_
 
 - Analysis and comprehension of high-throughput genomic data
-
     - Rigorous statistical analysis
     - Reproducible work flows
     - Integrative analysis
 
 - More than 12 years old, 1024 software packages
+
+Web resources
+
 - https://bioconductor.org
+    - biocViews of available packages; package landing pages
+    - Courses and work flows
+    - Developer resources, including package submission guidelines
+
 - https://support.bioconductor.org
 
 Why use _R_ / _Bioconductor_?
@@ -233,13 +239,23 @@ Parallel evaluation
     }, BPREDO = res, BPPARAM=SerialParam())
     ```
 
+## [Docker](http://bioconductor.org/help/docker/) and
+   [Amazon Machine Instance](http://bioconductor.org/help/bioconductor-cloud-ami/)
+   containers
+
 ## Other highlights
 
-- docker and Amazon Machine Instance containers
-- `Rsamtools::pileup()`
-- [Homo.sapiens](http://bioconductor.org/packages/Homo.sapiens) and
-  friends
-- Landing page 'shields' for users and developers
+- Coordinate mapping: genome to/from transcripts (GenomicFeatures);
+  genome to/from alignments (GenomicAlignments)
+- NCList -- speed-up `findOverlaps()`
+- Import GFF files _much_ faster
+- `mapIds()`
+- `r Biocpkg("SummarizedExperiment")` package; row ranges or data
+  frame.
+- `r Biocpkg("Rhtslib")`
+- Landing page 'shields' for users and developers, e.g,. 
+  `r Biocpkg("Rsamtools")`
+- [Newsletters](http://bioconductor.org/help/newsletters/)
 
 # Project directions ??
 
