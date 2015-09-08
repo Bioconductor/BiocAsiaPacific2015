@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 Author: Martin Morgan (<a
-  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+  href="mailto:martin.morgan@roswellpark.org">martin.morgan@roswellpark.org</a>)<br/ >
 Date: 7 September, 2015<br />
 
 The material in this document requires _R_ version 3.2 and

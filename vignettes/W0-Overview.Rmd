@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 Author: Martin Morgan (<a
-  href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
+  href="mailto:martin.morgan@roswellpark.org">martin.morgan@roswellpark.org</a>)<br/ >
 Date: 7 October, 2015<br />
 Back to [Workshop Outline](Developer-Meeting-Workshop.html)<br />
 
