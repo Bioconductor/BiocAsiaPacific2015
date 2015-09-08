@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 Author: Martin Morgan (<a
   href="mailto:mtmorgan@fredhutch.org">mtmorgan@fredhutch.org</a>)<br/ >
 Date: 8 September, 2015<br />
+This document: https://github.com/Bioconductor/BiocAsiaPacific2015 --> vignettes/M2-Packages-Exercise.Rmd
 
 # Example
 
