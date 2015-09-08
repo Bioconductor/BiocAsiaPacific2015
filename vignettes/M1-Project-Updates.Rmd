@@ -36,7 +36,9 @@ _Bioconductor_
     - Reproducible work flows
     - Integrative analysis
 
-- More than 12 years old, 1024 software packages
+- More than 12 years old, 1024 software packages,
+  [highly cited](http://bioconductor.org/help/publications/),
+  [Google analytics](http://www.google.com/analytics/)
 
 Web resources
 
@@ -239,9 +241,7 @@ Parallel evaluation
     }, BPREDO = res, BPPARAM=SerialParam())
     ```
 
-## [Docker](http://bioconductor.org/help/docker/) and
-   [Amazon Machine Instance](http://bioconductor.org/help/bioconductor-cloud-ami/)
-   containers
+## [Docker](http://bioconductor.org/help/docker/) and [Amazon Machine Instance](http://bioconductor.org/help/bioconductor-cloud-ami/) containers
 
 ## Other highlights
 
