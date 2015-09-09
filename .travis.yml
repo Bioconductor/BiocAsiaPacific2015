@@ -1,12 +1,8 @@
 # Sample .travis.yml for R projects
 
 language: r
-warnings_are_errors: true
+bioc_required: true
 sudo: required
-
-env:
- global:
-   - CRAN: http://cran.rstudio.com
 
 notifications:
   email:
@@ -14,10 +10,3 @@ notifications:
     on_failure: change
 
 bioc_use_devel: true
-
-bioc_packages: BiocInstaller, BiocStyle, knitr, AnnotationHub,
-    BSgenome.Hsapiens.UCSC.hg19, BiocParallel, Biostrings, DESeq2,
-    GenomicAlignments, GenomicFiles, GenomicRanges, Gviz,
-    Homo.sapiens, IRanges, RNAseqData.HNRNPC.bam.chr14, Rsamtools,
-    TxDb.Hsapiens.UCSC.hg19.knownGene, VariantAnnotation, airway,
-    biomaRt, ggplot2, org.Hs.eg.db, rtracklayer, shiny, knitr
