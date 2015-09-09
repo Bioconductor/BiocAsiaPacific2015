@@ -120,9 +120,10 @@
   Sequencing
   \begin{itemize}
   \item Differential expression
-  \item ChIP-seq
+  \item ChIP-seq, methyl-seq
   \item Called variants
-  \item Copy number
+  \item Copy number, structure
+  \item Microbiome
   \end{itemize}
   Methylation, expression, and other microarrays
   \smallskip\par
@@ -154,7 +155,7 @@
     \item Benefits: reduce dependence, stabilize error rate estimates,
       and improve reproducibility
     \end{itemize}
-    \Bioconductor{} support: \Biocpkg{sva}
+    \Bioconductor{} support: \Biocpkg{sva}; also \Biocpkg{RUVSeq}
     \column{.5\textwidth}
     \only<1>{
       \includegraphics[width=\textwidth]{T1_figures/nrg2825-f2.jpg}
@@ -189,7 +190,8 @@
   \includegraphics[width=\textwidth]{T1_figures/bsseq_analysis-1.png}
   \medskip\par \Bioconductor{} support: whole-genome (\Biocpkg{bsseq})
   or reduced representation (\Biocpkg{MethylSeekR}) bisulfite
-  sequencing; Illumina 450k arrays (\Biocpkg{minfi})
+  sequencing; Illumina 450k arrays (\Biocpkg{minfi}) -- Peter Hickey's
+  talks(!)
 \end{frame}
 
 \begin{frame}{Exemplar: Differential Representation}
@@ -208,9 +210,11 @@
     \column{.5\textwidth}
     \includegraphics[width=\textwidth]{T1_figures/DESeq2_parathyroid-plotMApadjchange.png}
   \end{columns}
-  \bigskip\par\Bioconductor{} support: \Biocpkg{DESeq2}, \Biocpkg{edgeR}, many
-  statistical `lessons learned' from microarrays; extensive
-  integration with down-stream tools
+  \bigskip\par\Bioconductor{} support: \Biocpkg{DESeq2},
+  \Biocpkg{edgeR}, many statistical `lessons learned' from
+  microarrays; extensive integration with down-stream
+  tools. \Biocpkg{limma} \Rfunction{voom} when transformation to an
+  approximate normal distribution is appropriate.
 \end{frame}
 
 \begin{frame}{Exemplar: Visualization}
@@ -279,50 +283,63 @@ E126hg38 <-
   \end{columns}
 \end{frame}
 
-Introduction to \Bioconductor
+\begin{frame}{Exemplars: \emph{etcetera!}}
+  \begin{columns}[t]
+    \column{.5\textwidth}
+    ChIP-seq
+    \begin{itemize}
+    \item \Biocpkg{csaw} -- window-based differential binding.
+    \end{itemize}
+    Variants
+    \begin{itemize}
+    \item \Biocpkg{VariantFiltering} -- characterization of variants.
+    \item \Biocpkg{SomaticSignatures} -- mutational signatures
+      associated with SNPs.
+    \end{itemize}
+    Sequencing work flows / reports
+    \begin{itemize}
+    \item \Biocpkg{QuasR}, \Biocpkg{systemPipeR}.
+    \end{itemize}
+    \column{.5\textwidth}
+    Pathways
+    \begin{itemize}
+    \item \Biocpkg{pathview} integration and visualization.
+    \end{itemize}
+    Flow cytometry
+    \begin{itemize}
+    \item \Biocpkg{flowCore}; 
+      `\href{http://bioconductor.org/packages/release/BiocViews.html\#___FlowCytometry}{FlowCytometry}'
+      biocViews term.
+    \end{itemize}
+    Mass Spec / Proteomics
+    \begin{itemize}
+    \item \Biocpkg{mzR}; proteomics
+      \href{http://bioconductor.org/help/workflows/proteomics/}{workflow}.
+    \end{itemize}
+    Visualization
+    \begin{itemize}
+    \item \Biocpkg{ComplexHeatmap}, \Biocpkg{HilbertCurve}
+    \end{itemize}
+  \end{columns}
+\end{frame}
 
-- R
-- packages
-- support site
-- teaching and training material
-- developer resources
-
-Guiding principles: \emph{analysis} and \emph{comprehension}
-
-- Need for statistical analysis: volume of data, designed experiments,
-  technological artifacts
-
-- Comprehension: place statistical results in context (annotation); 
-  communicate with team members (visualization, reporting); reproducible
-
-- Usable: tested, documented, re-usable classes to manage mundane
-
-Typical high-throughput work flows
-
-- Role for \Bioconductor
-- Important data structures: GenomicRanges, SummarizedExperiment
-
-Analysis: gene expression
-
-Analysis: DNA variant calling
-
-Analysis: flow cytometry
-
-Analysis: proteomics
-
-Analysis: metabolomics
-
-Annotation resources
-
-- 'org'
-- 'TxDb'
-- AnnotationHub -- liftOver
+\begin{frame}{Summary}
+  \begin{itemize}
+  \item Open-source, open-development statistical programming language
+  \item Packages!
+  \item Extensive, statistical, reproducible, leading edge, accessible.
+  \item Sequencing, methylation and other arrays, flow cytometery,
+    proteomics, ...
+  \end{itemize}
+\end{frame}
 
 \begin{frame}{Acknowledgments}
   
-  Core (Seattle / Buffalo): Sonali Arora, Marc Carlson, Nate Hayden,
-  Jim Hester, Jim Java, Brian Long, Valerie Obenchain, Herv\'e
-  Pag\`es, Paul Shannon, Dan Tenenbaum.  
+  \url{http://bioconductor.org}
+  \medskip\par
+  Core (Seattle / Buffalo): Jim Hester, Jim Java, Brian Long, Valerie
+  Obenchain, Herv\'e Pag\`es, Dan Tenenbaum. Recent alumni: Marc
+  Carlson, Sonali Arora, Nate Hayden, Paul Shannon.
   \medskip\par
   International developer community, technical and scientific advisory
   boards.
