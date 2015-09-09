@@ -30,7 +30,7 @@
   \R{}
   \begin{itemize}
   \item \url{http://r-project.org}
-  \item Open-source, statistical programming language; widely used in
+  \item Open-source statistical programming language; widely used in
     academia, finance, pharma, \ldots
   \item Core language, `base' and $>5000$ contributed packages
   \item Interactive sessions, scripts, packages
@@ -48,7 +48,8 @@
 
 \section*{Principles}
 
-\begin{frame}{Why use \R{} / \Bioconductor{}?}
+\begin{frame}[t]{Why use \R{} / \Bioconductor{}?}
+  \bigskip\par
   Hallmarks of effective computational software
   \begin{enumerate}
   \item Extensive: \only<2-5>{software, annotation, integration}
@@ -254,7 +255,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Exemplar: Annotation}
+\begin{frame}[fragile]{Exemplar: Three Types of Annotation Resources}
   \begin{columns}
     \column{.5\textwidth}
     \begin{itemize}
@@ -324,18 +325,28 @@ E126hg38 <-
 \end{frame}
 
 \begin{frame}{Summary}
+  More information
   \begin{itemize}
-  \item Open-source, open-development statistical programming language
-  \item Packages!
+  \item \url{http://bioconductor.org}
+  \item \url{https://support.bioconductor.org}
+  \end{itemize}
+  Why \R{} / \Bioconductor?
+  \begin{itemize}
+  \item Open-source statistical programming language
+  \item Open-development packages!
   \item Extensive, statistical, reproducible, leading edge, accessible.
   \item Sequencing, methylation and other arrays, flow cytometery,
     proteomics, ...
+  \end{itemize}
+  Increasingly easy to learn and use
+  \begin{itemize}
+  \item \href{http://rstudio.org}{RStudio}, Coursera, `shiny'
+    applications\ldots
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Acknowledgments}
   
-  \url{http://bioconductor.org}
   \medskip\par
   Core (Seattle / Buffalo): Jim Hester, Jim Java, Brian Long, Valerie
   Obenchain, Herv\'e Pag\`es, Dan Tenenbaum. Recent alumni: Marc
