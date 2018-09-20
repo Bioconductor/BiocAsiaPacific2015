@@ -145,7 +145,7 @@
   Leek et al., 2010, Nature Reviews Genetics 11,
   \href{http://www.nature.com/nrg/journal/v11/n10/abs/nrg2825.html}{733-739},
   Leek \& Story
-  \href{http://dx.doi.org/10.1371/journal.pgen.0030161}{PLoS Genet
+  \href{https://doi.org/10.1371/journal.pgen.0030161}{PLoS Genet
     3(9): e161}
   \begin{columns}
     \column{.5\textwidth} 
